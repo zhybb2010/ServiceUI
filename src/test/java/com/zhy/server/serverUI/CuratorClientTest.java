@@ -1,108 +1,58 @@
 package com.zhy.server.serverUI;
 
+import com.mysql.jdbc.TimeUtil;
+import com.zhy.server.serverUI.utils.CuratorZookeeperClientUtil;
 import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.retry.RetryNTimes;
-import org.junit.Before;
+import org.apache.curator.framework.api.CuratorWatcher;
+import org.apache.zookeeper.WatchedEvent;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import java.util.concurrent.ConcurrentSkipListSet;
 
-/**
- * Curator framework's client test.
- * Output:
- *  $ create /zktest hello
- *  $ ls /
- *  [zktest, zookeeper]
- *  $ get /zktest
- *  hello
- *  $ set /zktest world
- *  $ get /zktest
- *  world
- *  $ delete /zktest
- *  $ ls /
- *  [zookeeper]
- */
+
 public class CuratorClientTest {
 
-    /** Zookeeper info */
-    private static final String ZK_ADDRESS = "192.168.1.129:2181";
-    private static final String ZK_PATH = "/test/zhy";
-    private CuratorFramework client;
+    Logger LOG = LoggerFactory.getLogger(this.getClass());
+
+    private ConcurrentSkipListSet watchers = new ConcurrentSkipListSet();
 
     @Test
     public void MainTest() throws Exception{
 
-//        print(createNode("/curator"));
+        CuratorZookeeperClientUtil clientUtil = new CuratorZookeeperClientUtil();
+        CuratorFramework client = clientUtil.getConnect();
+        client.getData().usingWatcher(new ZKWatchRegister()).inBackground().forPath(clientUtil.ZK_PATH);
 
-//        getNode("/").forEach(CuratorClientTest::print);
-
-
-
-    }
-
-
-
-    @Before
-    public void zkGetNode() throws Exception{
-        //1.连接上zk，获取zk客户端
-        client = CuratorFrameworkFactory
-                        .builder()
-                        .connectString(ZK_ADDRESS)
-                        .namespace("curator")
-                        .retryPolicy(new RetryNTimes(2000,20000))
-                        .build();
-        client.start();
-        System.out.println("zk client start successfully!");
-    }
-
-    // create node
-    public String createNode(String path) throws Exception{
-        return client.create()
-                .creatingParentsIfNeeded()
-                .forPath(path);
-    }
-
-    public String createNode(String path, String data) throws Exception{
-        return client.create()
-                .creatingParentsIfNeeded()
-                .forPath(path,data.getBytes());
-    }
-
-    //setData on node
-    public void setData(String node, String data) throws Exception {
-        client.setData()
-                .forPath(node, data.getBytes());
-    }
-
-    //getData on node
-    public byte[] getData(String node) throws Exception {
-        byte[] bytes = client.getData()
-                .forPath(node);
-        return bytes;
-    }
-
-    //getNodes on path
-    public List<String> getNode(String path) throws Exception {
-        return client.getChildren()
-                .forPath("/");
-    }
-
-    //removeNode
-    public void removeNode() throws Exception {
-        client.delete().forPath(ZK_PATH);
-    }
-
-
-    private static void print(String... cmds) {
-        StringBuilder text = new StringBuilder("$ ");
-        for (String cmd : cmds) {
-            text.append(cmd).append(" ");
+        while (true){
+            Thread.sleep(5000L);
         }
-        System.out.println(text.toString());
+
     }
 
-    private static void print(Object result) {
-        System.out.println(result instanceof byte[] ? new String((byte[]) result) : result);
+
+    public class ZKWatchRegister implements CuratorWatcher {
+        @Override
+        public void process(WatchedEvent event) throws Exception {
+            System.out.println("event type is " + event.getType());
+            switch (event.getType()){
+                case NodeDeleted:
+                    break;
+                case None:
+                    break;
+                case NodeCreated:
+                    break;
+                case NodeDataChanged:
+                    break;
+                case DataWatchRemoved:
+                    break;
+                case ChildWatchRemoved:
+                    break;
+                case NodeChildrenChanged:
+                    break;
+                default:
+            }
+        }
     }
 }
