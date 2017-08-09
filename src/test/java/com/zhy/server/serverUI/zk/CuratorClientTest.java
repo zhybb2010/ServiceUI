@@ -1,4 +1,4 @@
-package com.zhy.server.serverUI;
+package com.zhy.server.serverUI.zk;
 
 import com.mysql.jdbc.TimeUtil;
 import com.zhy.server.serverUI.utils.CuratorZookeeperClientUtil;
@@ -26,7 +26,7 @@ public class CuratorClientTest {
         client.getData().usingWatcher(new ZKWatchRegister()).inBackground().forPath(clientUtil.ZK_PATH);
 
         while (true){
-            Thread.sleep(5000L);
+            Thread.sleep(Integer.MAX_VALUE);
         }
 
     }

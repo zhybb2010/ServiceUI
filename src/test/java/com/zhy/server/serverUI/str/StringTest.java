@@ -1,20 +1,14 @@
-package com.zhy.server.serverUI;
+package com.zhy.server.serverUI.str;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 //@RunWith(SpringRunner.class)
 //@SpringBootTest
-public class ServerUiApplicationTests {
+public class StringTest {
 
 	@Test
 	public void contextLoads() {

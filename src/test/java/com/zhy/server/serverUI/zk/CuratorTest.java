@@ -1,4 +1,4 @@
-package com.zhy.server.serverUI;
+package com.zhy.server.serverUI.zk;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
