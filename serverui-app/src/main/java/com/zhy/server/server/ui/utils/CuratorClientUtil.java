@@ -3,6 +3,7 @@ package com.zhy.server.server.ui.utils;
 import com.zhy.server.ui.api.utils.ICuratorClientUtil;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.api.ACLBackgroundPathAndBytesable;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
@@ -29,7 +30,7 @@ public class CuratorClientUtil implements ICuratorClientUtil {
 
     private CuratorFramework client;
 
-    public void getConnect(String address,String namespace) throws Exception{
+    public void getConnect(String address, String namespace) throws Exception {
         //connect & retrun curatorClient
         client = CuratorFrameworkFactory
                 .builder()
@@ -37,29 +38,27 @@ public class CuratorClientUtil implements ICuratorClientUtil {
                 .connectionTimeoutMs(CONNECT_TIMEOUT)
                 .sessionTimeoutMs(SESSION_TIMEOUT)
                 .namespace(namespace)
-                .retryPolicy(new RetryNTimes(RETRY_TIME,RETRY_INTERVAL))
+                .retryPolicy(new RetryNTimes(RETRY_TIME, RETRY_INTERVAL))
                 .build();
         client.start();
         logger.info("zk client start successfully!");
     }
 
     // create node
-    public String createNode(String path) throws Exception{
+    public String createNode(String path) throws Exception {
         return client.create()
                 .creatingParentsIfNeeded()
                 .forPath(path);
     }
 
-    public String createNode(String path, String data) throws Exception{
+    public String createNode(String path, String data) throws Exception {
         return client.create()
                 .creatingParentsIfNeeded()
-                .forPath(path,data.getBytes());
+                .forPath(path, data.getBytes());
     }
 
-    public String createTempNode(String path) throws Exception{
-        return client.create()
-                .withMode(CreateMode.EPHEMERAL)
-                .forPath(path);
+    public String createEphemeralSequential(String path, byte[] data) throws Exception {
+        return data != null ? (String) ((ACLBackgroundPathAndBytesable) client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL_SEQUENTIAL)).forPath(path, data) : (String) ((ACLBackgroundPathAndBytesable) client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL_SEQUENTIAL)).forPath(path);
     }
 
 
@@ -71,17 +70,17 @@ public class CuratorClientUtil implements ICuratorClientUtil {
     }
 
     //getData on node
-    public byte[] getData(String node) throws Exception {
+    public byte[] getData(String path) throws Exception {
         byte[] bytes = client.getData()
 //                .storingStatIn(new Stat())//返回节点信息到stat
-                .forPath(node);
+                .forPath(path);
         return bytes;
     }
 
     //getNodes on path
-    public List<String> getNode(String path) throws Exception {
+    public List<String> getChildNode(String path) throws Exception {
         return client.getChildren()
-                .forPath("/");
+                .forPath(path);
     }
 
     //removeNode
