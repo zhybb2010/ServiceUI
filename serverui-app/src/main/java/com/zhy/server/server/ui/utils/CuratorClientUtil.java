@@ -30,14 +30,21 @@ public class CuratorClientUtil implements ICuratorClientUtil {
 
     private CuratorFramework client;
 
-    public void getConnect(String address, String namespace) throws Exception {
+//    private String root;
+
+    public void getConnect(String address, String root) throws Exception {
+
+//        if (!root.startsWith("/")) {
+//            root = "/" + root;
+//        }
+//        this.root = root;
         //connect & retrun curatorClient
         client = CuratorFrameworkFactory
                 .builder()
                 .connectString(address)
                 .connectionTimeoutMs(CONNECT_TIMEOUT)
                 .sessionTimeoutMs(SESSION_TIMEOUT)
-                .namespace(namespace)
+//                .namespace(root)
                 .retryPolicy(new RetryNTimes(RETRY_TIME, RETRY_INTERVAL))
                 .build();
         client.start();
@@ -71,8 +78,9 @@ public class CuratorClientUtil implements ICuratorClientUtil {
 
     //getData on node
     public byte[] getData(String path) throws Exception {
+        Stat stat = new Stat();
         byte[] bytes = client.getData()
-//                .storingStatIn(new Stat())//返回节点信息到stat
+                .storingStatIn(stat)//返回节点信息到stat
                 .forPath(path);
         return bytes;
     }
@@ -93,7 +101,7 @@ public class CuratorClientUtil implements ICuratorClientUtil {
     }
 
     public Stat checkExists(String path) throws Exception {
-        return client.checkExists().forPath(path);
+        return client.checkExists().creatingParentsIfNeeded().forPath(path);
     }
 
     public CuratorFramework getClient() {

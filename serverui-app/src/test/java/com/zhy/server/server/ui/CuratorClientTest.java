@@ -1,7 +1,6 @@
 package com.zhy.server.server.ui;
 
 import com.zhy.server.server.ui.utils.CuratorClientUtil;
-import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.api.CuratorWatcher;
 import org.apache.curator.framework.recipes.leader.LeaderLatch;
 import org.apache.zookeeper.WatchedEvent;
@@ -23,13 +22,15 @@ public class CuratorClientTest {
     @Test
     public void MainTest() throws Exception{
 
-        String address = "192.168.1.129:2181";
+        String address = "192.168.77.151:2181";
         String appName = "server";
 
         String leader_path = "/led";
 
         CuratorClientUtil clientUtil = new CuratorClientUtil();
         clientUtil.getConnect(address,appName);
+
+        clientUtil.getChildNode("/");
 
 
         //检测led节点是否存在
